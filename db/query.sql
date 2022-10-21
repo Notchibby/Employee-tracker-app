@@ -6,7 +6,6 @@ employee.last_name AS last_name,
 role.title AS title,
 department.name AS department,
 role.salary AS salary,
-employee.manager_id As manager_id,
 CONCAT(manager.first_name, ' ', manager.last_name) As manager
 
 FROM employee
