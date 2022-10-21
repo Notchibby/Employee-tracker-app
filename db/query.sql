@@ -10,4 +10,5 @@ employee.manager_id As manager_id
 
 FROM employee
 JOIN department ON employee.department = department.id
-JOIN role ON employee.role = employee.id;
+JOIN role ON employee.role = role.id
+JOIN manager_id ON employee.id = employee.manager_id;
