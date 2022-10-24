@@ -1,15 +1,20 @@
-require('dotenv').config();
-const sqlconnect = require('./config/connection');
-const inquirer = require('inquirer');
-const mysql = require('mysql2');
+const viewAllEmployee = () => {return `SELECT 
+
+employee.id As id,
+employee.first_name AS first_name,
+employee.last_name AS last_name,
+role.title AS title,
+department.name AS department,
+role.salary AS salary,
+CONCAT(manager.first_name, ' ', manager.last_name) As manager
+
+FROM employee
+LEFT JOIN department ON employee.department = department.id
+LEFT JOIN role ON employee.role = role.id
+LEFT JOIN employee manager ON manager.id = employee.manager_id
+`
+}
 
 
-const db = mysql.createConnection(
-    sqlconnect, 
-    console.log(`Connected to the library_db database.`)
-    );
 
-db.query('SELECT * FROM department', (err, result) =>
-err ? console.error(err) : console.table(result)
-);
-  
+module.exports = {viewAllEmployee}
