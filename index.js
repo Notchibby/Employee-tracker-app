@@ -10,7 +10,12 @@ const db = mysql.createConnection(
     console.log(`Connected to the library_db database.`)
     );
 
+// db.query( queries.viewAllEmployee(), (err, result) =>
+// err ? console.error(err) : console.table(result)
+// );
+
 db.query( queries.viewAllEmployee(), (err, result) =>
 err ? console.error(err) : console.table(result)
 );
+  
   
