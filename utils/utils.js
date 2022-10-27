@@ -10,6 +10,8 @@ const options = [
 ];
 
 
+
+
 const viewAllEmployee = () => {return `SELECT 
 
 employee.id As id,
@@ -21,9 +23,10 @@ role.salary AS salary,
 CONCAT(manager.first_name, ' ', manager.last_name) As manager
 
 FROM employee
-LEFT JOIN department ON employee.department = department.id
-LEFT JOIN role ON employee.role = role.id
 LEFT JOIN employee manager ON manager.id = employee.manager_id
+INNER JOIN role on role.id = employee.role_id
+INNER JOIN department ON department.id = role.department_id
+ORDER BY employee.id
 `
 }
 
@@ -46,7 +49,8 @@ FROM role
 LEFT JOIN department ON role.department = department.id;
 `}
 
-const addEmployee = ({...employee}) => {return `INSERT INTO employee (first_name, last_name, role, manager_id )
+
+const addEmployee = ({employee}) => {return `INSERT INTO employee (first_name, last_name, department, role, manager_id )
 VALUES (${employee});`}
 
 
