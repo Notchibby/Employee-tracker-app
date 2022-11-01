@@ -9,6 +9,7 @@ const db = mysql.createConnection(
     console.log(`Connected to the library_db database.`)
 );
 
+// helper function to run sql view syntaxes
 const callQuery = (cb) => {
     return db.query(cb, (err, result) => {
         if (err) {
@@ -20,19 +21,8 @@ const callQuery = (cb) => {
 
 }
 
-const updateQuery = (cb) => {
-    return db.query(cb, (err, result) => {
-        if (err) {
-            throw err
-        }
-        menu()
-    })
 
-}
-
-
-
-
+// calls the menu
 function menu() {
     inquirer.prompt({
         type: 'list',
@@ -64,17 +54,23 @@ function menu() {
                 return console.log('Thank you for using the Employee Tracker app')
             }
 
-
-
             if (answers.menu === 'Add Employees') {
                 addEmployee()
+            }
+
+            if (answers.menu === 'Add Department') {
+                addDepartment()
+            }
+
+            if (answers.menu === 'Update Employee Role') {
+                updateEmployeeRole()
             }
 
         })
 
 }
 
-
+// function to add an employee
 function addEmployee() {
     db.query('SELECT * FROM role', (err, result) => {
         if (err) {
@@ -148,19 +144,16 @@ function addEmployee() {
                     let first_name = answers.first_name
 
                     let last_name = answers.last_name
-              
-                    let values = [first_name, last_name, answers.Role, answers.Manager]
-                    console.log(values)
 
-                    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id ) VALUES (?,?,?,?)`, values,  (err) => {
+                    let values = [first_name, last_name, answers.Role, answers.Manager]
+
+                    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id ) VALUES (?,?,?,?)`, values, (err) => {
                         if (err) {
                             throw err
                         }
                     }
-
-
-
                     )
+                    menu()
                 })
 
         })
@@ -168,7 +161,7 @@ function addEmployee() {
 }
 
 
-
+// function to add role
 const addRole = () => {
 
     db.query('SELECT * FROM department', (err, result) => {
@@ -195,13 +188,6 @@ const addRole = () => {
             },
 
             {
-                type: 'input',
-                name: 'Role_salary',
-                message: 'What is the salary of the role?',
-
-            },
-
-            {
                 type: 'list',
                 name: 'department',
                 message: 'Which department does the role belong to?',
@@ -210,18 +196,130 @@ const addRole = () => {
             },
 
 
+            {
+                type: 'input',
+                name: 'Role_salary',
+                message: 'What is the salary of the role?',
+
+            },
 
         ])
 
             .then((answers) => {
                 console.log(`${answers.Role_name} has been successfully added`)
-                console.log(answers)
+                answers = [answers.Role_name, answers.department, answers.Role_salary]
+                db.query('INSERT INTO role (title, department_id, salary) VALUES (?,?,?)', answers, (err) => {
+                    if (err) {
+                        throw err
+                    }
+                }
+                )
+
+                menu()
 
             })
     })
 }
 
 
+// function to add department
+function addDepartment() {
+    inquirer.prompt([
+
+        {
+            type: 'input',
+            name: 'Department_name',
+            message: 'What is the name of the Department?',
+
+        },
 
 
+    ])
+
+        .then((answers) => {
+            console.log(`${answers.Department_name} has been added to departments`)
+            answers = answers.Department_name
+            db.query('INSERT INTO department (name) VALUES (?)', answers, (err) => {
+                if (err) {
+                    throw err
+                }
+            }
+            )
+
+            menu()
+        })
+
+}
+
+
+// function to update employee role
+function updateEmployeeRole() {
+    db.query('SELECT * FROM employee', (err, result) => {
+        if (err) {
+            throw err
+        }
+
+        let employees = result.map((employee) => {
+            return ({
+                name: employee.first_name + ' ' + employee.last_name,
+                value: employee.id
+            })
+        })
+
+
+        db.query('SELECT * FROM role', (err, result) => {
+            if (err) {
+                throw err
+            }
+            let employeeRoleChoices = result.map((role) => {
+                return ({
+                    name: role.title,
+                    value: role.id
+                })
+            })
+
+            inquirer.prompt([
+
+                {
+                    type: 'list',
+                    name: 'update_employee',
+                    message: 'Which employees role would you like to update?',
+                    choices: employees,
+
+                },
+
+                {
+                    type: 'list',
+                    name: 'update_role',
+                    message: 'Which role would you like to assign to the selected employee?',
+                    choices: employeeRoleChoices,
+
+                },
+
+            ])
+
+                .then((answers) => {
+                    console.log(`employee's role has been successfully updated`)
+                    answers = [answers.update_role, answers.update_employee]
+                    db.query('UPDATE employee SET role_id = ? WHERE id = ?', answers, (err) => {
+                        if (err) {
+                            throw err
+                        }
+                    }
+                    )
+                    menu()
+                })
+
+
+
+
+
+        })
+    })
+}
+
+// function that initialises the menu
 menu()
+
+
+

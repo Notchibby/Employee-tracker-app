@@ -1,3 +1,4 @@
+// lists the options for the menu
 const options = [
  'View All Employees',
  'Add Employees',
@@ -9,9 +10,7 @@ const options = [
  'Quit'
 ];
 
-
-
-
+// helper function that views all employee
 const viewAllEmployee = () => {return `SELECT 
 
 employee.id As id,
@@ -30,31 +29,24 @@ ORDER BY employee.id
 `
 }
 
+// function that views all departments
 const viewDepartment = () => {return`
 SELECT *
 FROM department`}
 
-const viewManagers = () => {return `
-SELECT 
-CONCAT(manager.first_name, ' ', manager.last_name) As manager
-FROM employee
-INNER JOIN employee manager ON manager.id = employee.manager_id
-`
-}
 
+// function that views all roles
 const viewRoles = () => {return `
 SELECT 
 role.id, role.title, department.name as department , role.salary
 FROM role
-LEFT JOIN department ON role.department = department.id;
+LEFT JOIN department ON role.department_id = department.id;
 `}
 
 
-const addEmployee = ({employee}) => {return `INSERT INTO employee (first_name, last_name, department, role, manager_id )
-VALUES (${employee});`}
 
 
 
 
 
-module.exports = {options, viewManagers, viewAllEmployee, addEmployee, viewRoles, viewDepartment}
+module.exports = {options, viewAllEmployee, viewRoles, viewDepartment}
